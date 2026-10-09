@@ -46,7 +46,7 @@ test('catat menambah satu baris berformat benar', () => {
   assert.strictEqual(st.baris.length, 1);
   assert.strictEqual(st.baris[0][0], 'a1');
   assert.strictEqual(st.baris[0][1].toISOString(), '2026-10-09T01:12:00.000Z');
-  assert.deepStrictEqual(st.baris[0].slice(2).map(String), ['Pengeluaran', 'Makan & Minum', '25000', 'kopi', 'Shortcut']);
+  assert.deepStrictEqual(Array.from(st.baris[0].slice(2), String), ['Pengeluaran', 'Makan & Minum', '25000', 'kopi', 'Shortcut']);
   assert.strictEqual(typeof st.baris[0][4], 'number');
 });
 
