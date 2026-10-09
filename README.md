@@ -32,6 +32,7 @@ Jalankan 5 skenario di bagian "Uji ujung ke ujung" pada `docs/SHORTCUT.md`, lalu
 | **Tambah atau ubah kategori** | Tab **Kategori** → tambah baris (Nama, Emoji, Jenis, centang Aktif). Menu Shortcut ikut berubah setelah satu kali mencatat. |
 | **Sembunyikan kategori** | Hapus centang **Aktif**. Data lama tetap ada. |
 | **Salah catat** | Tab **Transaksi** → edit atau hapus barisnya. Ringkasan langsung menyesuaikan. |
+| **Catatan berisi nomor telepon atau rumus** | Aman. Kolom Catatan berformat teks, dan catatan yang diawali `=`, `+`, `-`, `@` disimpan apa adanya. |
 | **Catat manual dari Sheets** | Tambah baris di tab Transaksi, isi Sumber `Manual`. Kolom ID boleh diisi teks apa pun yang unik. |
 | **Sedang offline** | Catat seperti biasa. iOS akan menampilkan error, tapi transaksi tersimpan di antrian dan terkirim otomatis saat Anda mencatat lagi dengan internet. |
 
@@ -43,9 +44,11 @@ Jalankan 5 skenario di bagian "Uji ujung ke ujung" pada `docs/SHORTCUT.md`, lalu
 | `Kunci belum diatur…` | `buatKunci` belum pernah dijalankan | Jalankan `buatKunci` di editor Apps Script |
 | `Nominal tidak valid: …` | Nominal 0, negatif, atau di atas Rp1 miliar | Catat ulang dengan nominal yang benar |
 | `Kategori "…" tidak dikenal…` | Kategori sudah dihapus atau dinonaktifkan | Transaksi tetap tersimpan sebagai Lainnya; ubah di tab Transaksi bila perlu |
+| `Coba lagi nanti. …` | Gangguan di skrip atau Google | Biasanya sementara: transaksi tetap di antrian dan dikirim pada run berikutnya. Kalau terus muncul, pastikan tab bernama persis `Transaksi` dan `Kategori` |
+| `Skrip tidak membalas dengan benar…` | Google membalas halaman error, misalnya izin skrip perlu diberikan ulang setelah kode diubah | Buka editor Apps Script, jalankan `tesCatat` sekali untuk memberi izin; transaksi tetap di antrian |
 | `Sudah tercatat …` | Transaksi ini sudah ada (biasanya dari antrian) | Tidak perlu apa-apa |
 | `Permintaan tidak valid` | Format kiriman Shortcut tidak terbaca | Lihat catatan di akhir bagian E pada `docs/SHORTCUT.md` |
-| `Terjadi kesalahan di skrip: …` | Error di skrip, misalnya nama tab diubah | Pastikan tab bernama persis `Transaksi` dan `Kategori` |
+| Shortcut berhenti sebelum menu muncul | Menu kategori belum bisa diambil (lihat notifikasinya) | Perbaiki penyebabnya (biasanya kunci). Menu diambil ulang otomatis pada run berikutnya |
 | Back Tap tidak bereaksi | Pengaturan Back Tap atau casing | Cek ulang pengaturan Back Tap; coba jalankan dari app Shortcuts |
 
 Jangan mengganti nama tab atau urutan kolom di tab Transaksi dan Kategori, karena skrip membacanya berdasarkan nama tab dan posisi kolom.

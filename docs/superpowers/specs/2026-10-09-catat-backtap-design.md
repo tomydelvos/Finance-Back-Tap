@@ -54,11 +54,11 @@ Zona waktu Asia/Jakarta, lokal Indonesia (pemisah rumus `;`, format `Rp25.000`).
 
 **Kunci:** fungsi `buatKunci()` dijalankan sekali dari editor; membuat kunci acak 32 karakter, menyimpannya di Script Properties (`KUNCI`), dan menuliskannya ke log untuk disalin ke Shortcut. Kunci tidak pernah disimpan di spreadsheet.
 
-**Kontrak:** semua permintaan `POST` dengan body JSON; semua balasan JSON `{ "ok": boolean, "pesan": string, ... }` (Apps Script tidak bisa mengatur kode status HTTP).
+**Kontrak:** semua permintaan `POST` dengan body JSON object; semua balasan JSON `{ "ok": boolean, "pesan": string, ... }` (Apps Script tidak bisa mengatur kode status HTTP). Error tak terduga di skrip dibalas `{ ok: false, ulang: true, pesan: "Coba lagi nanti. Terjadi kesalahan di skrip: …" }`.
 
 ### Aksi `kategori`
 - Request: `{ "aksi": "kategori", "kunci": "…" }`
-- Balasan: `{ "ok": true, "pengeluaran": [{ "nama", "emoji" }], "pemasukan": [{ "nama", "emoji" }] }` — hanya kategori dengan Aktif = TRUE, urut sesuai tab.
+- Balasan: `{ "ok": true, "pengeluaran": [{ "nama", "emoji" }], "pemasukan": [{ "nama", "emoji" }], "menuPengeluaran": ["🍜 Makan & Minum", …, "💰 Pemasukan…"], "menuPemasukan": ["💼 Gaji", …] }` — hanya kategori dengan Aktif = TRUE, urut sesuai tab. `menu…` berisi label siap tampil (emoji + spasi + nama, atau nama saja jika emoji kosong).
 
 ### Aksi `catat`
 - Request: `{ "aksi": "catat", "kunci", "id", "jenis", "kategori", "nominal", "catatan", "waktu" }`
@@ -67,13 +67,14 @@ Zona waktu Asia/Jakarta, lokal Indonesia (pemisah rumus `;`, format `Rp25.000`).
   2. Validasi:
      - `jenis` harus `Pengeluaran` atau `Pemasukan` (default `Pengeluaran` jika kosong).
      - `nominal` diterima sebagai angka atau teks: `25000`, `25.000`, `25,000`, `Rp 25.000`, `25rb`, `25k`, `1,5jt`, `1.5jt` → rupiah bulat. Harus > 0 dan ≤ 1.000.000.000; selain itu `ok: false`.
+     - `kategori` boleh berupa nama atau label menu (`🍜 Makan & Minum`); dicocokkan tanpa membedakan huruf besar/spasi, per jenis.
      - `kategori` yang tidak ada atau tidak aktif untuk jenis itu → disimpan sebagai `Lainnya`, dan `pesan` menyebutkannya.
      - `id` wajib; kosong → `ok: false`.
      - `waktu` ISO 8601; kosong atau tidak valid → waktu server.
      - `catatan` dipotong ke 140 karakter.
   3. `LockService.getScriptLock()` (tunggu ≤ 10 detik) agar kiriman bersamaan tidak saling menimpa.
   4. Cari `id` di kolom A (cocok persis). Jika sudah ada → tidak menambah baris, `pesan` diawali "Sudah tercatat".
-  5. Tambah baris dengan `Sumber = Shortcut`.
+  5. Tambah baris dengan `Sumber = Shortcut`. Catatan yang diawali `=`, `+`, `-`, `@` diberi apostrof agar tidak ditafsirkan sebagai rumus/angka; kolom Catatan berformat teks.
   6. Hitung ringkasan **bulan berjalan** (zona Asia/Jakarta) langsung dari tab Transaksi dan Kategori, bukan dari tab Ringkasan.
 - Balasan sukses: `{ ok: true, pesan }`, contoh:
   `Tersimpan Rp25.000 · 🍜 Makan & Minum`
@@ -98,8 +99,8 @@ Zona waktu Asia/Jakarta, lokal Indonesia (pemisah rumus `;`, format `Rp25.000`).
 5. Ask for Input (Text, boleh kosong): "Catatan?".
 6. Susun transaksi: `id` = tanggal `yyyyMMddHHmmssSSS` + `-` + angka acak 1000–9999; `waktu` = tanggal sekarang ISO 8601; `aksi = catat` + kunci + jenis, kategori, nominal, catatan.
 7. Tambahkan ke `catat-antrian.json`.
-8. Kirim tiap item antrian dengan POST JSON. Balasan `ok: true` → hapus dari antrian. Balasan `ok: false` → tampilkan `pesan` dan hapus dari antrian (tidak akan berhasil jika diulang). Tulis ulang file antrian berisi item yang tersisa.
-9. Show Notification dengan `pesan` balasan terakhir.
+8. Kirim tiap item antrian dengan POST JSON dan tampilkan `pesan` tiap balasan sebagai notifikasi. Item **tetap di antrian** jika `pesan` kosong (Google membalas halaman error) atau diawali `Coba lagi`; selain itu item dihapus, termasuk yang ditolak permanen. Tulis ulang file antrian berisi item yang tersisa.
+9. Jika menu kategori tidak bisa didapat (cache kosong dan skrip menolak), tampilkan `pesan` lalu hentikan Shortcut. Cache hanya disimpan jika balasan berisi `menuPengeluaran`.
 10. Panggil aksi `kategori` dan perbarui cache.
 
 **Setup iPhone:**
@@ -117,6 +118,7 @@ Zona waktu Asia/Jakarta, lokal Indonesia (pemisah rumus `;`, format `Rp25.000`).
 | Kategori tidak dikenal | Disimpan sebagai "Lainnya"; disebut di notifikasi |
 | ID sudah ada | Tidak ada baris baru; notifikasi "Sudah tercatat" + ringkasan |
 | Dua kiriman bersamaan | LockService menyerialkan penulisan |
+| Error sementara di skrip / halaman error Google | Item tetap di antrian, dikirim ulang pada run berikutnya |
 | Salah catat | Edit/hapus baris di tab Transaksi |
 
 ## 7. Pengujian

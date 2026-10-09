@@ -88,3 +88,8 @@ test('ringkasan ikut transaksi yang baru ditulis', () => {
   const r = tanganiPermintaan({ aksi: 'catat', kunci: 'K', id: 'a2', nominal: '10rb', kategori: 'Makan & Minum' }, st, now);
   assert.match(r.pesan, /\nBulan ini Rp35\.000/);
 });
+
+test('body berupa array ditolak sebagai permintaan tidak valid', () => {
+  assert.deepStrictEqual(polos(tanganiPermintaan([{ aksi: 'catat', kunci: 'K' }], s(), now)),
+    { ok: false, pesan: 'Permintaan tidak valid' });
+});

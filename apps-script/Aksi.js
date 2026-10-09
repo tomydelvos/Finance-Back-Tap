@@ -5,7 +5,7 @@ var SUMBER_SHORTCUT = 'Shortcut';
 var MENU_KE_PEMASUKAN = '💰 Pemasukan…';
 
 function tanganiPermintaan(body, store, sekarang) {
-  if (!body || typeof body !== 'object') return { ok: false, pesan: 'Permintaan tidak valid' };
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { ok: false, pesan: 'Permintaan tidak valid' };
 
   var kunciTersimpan = store.kunci();
   if (!kunciTersimpan) return { ok: false, pesan: 'Kunci belum diatur. Jalankan buatKunci() di editor Apps Script.' };

@@ -117,3 +117,21 @@ test('tesCatat menulis lalu menghapus baris tes', () => {
   assert.strictEqual(s.sheets.Transaksi.baris.length, 1);
   assert.ok(s.log.some((l) => l.includes('"ok":true')));
 });
+
+test('error sementara di skrip ditandai agar Shortcut mencoba lagi', () => {
+  const s = siapkan();
+  s.ctx.LockService.getScriptLock = () => ({ waitLock: () => { throw new Error('Lock timeout'); }, releaseLock: () => {} });
+  const r = post(s.ctx, { aksi: 'catat', kunci: 'K', id: 'b1', nominal: '25rb', kategori: 'Makan & Minum' });
+  assert.strictEqual(r.ok, false);
+  assert.strictEqual(r.ulang, true);
+  assert.strictEqual(r.pesan, 'Coba lagi nanti. Terjadi kesalahan di skrip: Lock timeout');
+  assert.strictEqual(s.sheets.Transaksi.baris.length, 1);
+});
+
+test('catatan yang diawali = + - @ diberi apostrof agar Sheets tidak menafsirkannya', () => {
+  const s = siapkan();
+  ['=1+1', '+62812', '-50 diskon', '@budi', 'kopi'].forEach((c, i) =>
+    post(s.ctx, { aksi: 'catat', kunci: 'K', id: 'c' + i, nominal: '1rb', kategori: 'Lainnya', catatan: c }));
+  assert.deepStrictEqual(s.sheets.Transaksi.baris.slice(1).map((b) => b[5]),
+    ["'=1+1", "'+62812", "'-50 diskon", "'@budi", 'kopi']);
+});

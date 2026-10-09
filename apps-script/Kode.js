@@ -19,7 +19,9 @@ function doPost(e) {
     }
     balasan = tanganiPermintaan(body, new SheetStore(), new Date());
   } catch (err) {
-    balasan = { ok: false, pesan: 'Terjadi kesalahan di skrip: ' + err.message };
+    // Error tak terduga (lock timeout, gangguan Sheets) bersifat sementara:
+    // Shortcut menyimpan item di antrian jika pesan diawali "Coba lagi".
+    balasan = { ok: false, ulang: true, pesan: 'Coba lagi nanti. Terjadi kesalahan di skrip: ' + err.message };
   }
   return ContentService.createTextOutput(JSON.stringify(balasan)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -58,7 +60,12 @@ SheetStore.prototype.adaId = function (id) {
 };
 
 SheetStore.prototype.tambah = function (baris) {
-  this.tabTransaksi.appendRow(baris);
+  // appendRow menafsirkan teks seperti diketik: catatan "=…", "+…", "-…", "@…"
+  // akan jadi rumus atau angka. Apostrof di depan membuatnya tetap teks.
+  var salinan = baris.slice();
+  var catatan = salinan[5];
+  if (typeof catatan === 'string' && /^[=+\-@]/.test(catatan)) salinan[5] = "'" + catatan;
+  this.tabTransaksi.appendRow(salinan);
 };
 
 SheetStore.prototype.transaksi = function () {
