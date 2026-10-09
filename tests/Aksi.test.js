@@ -35,7 +35,22 @@ test('body bukan JSON / aksi tak dikenal', () => {
 test('kategori: hanya aktif, dipisah per jenis, urut tab', () => assert.deepStrictEqual(
   polos(tanganiPermintaan({ aksi: 'kategori', kunci: 'K' }, s(), now)),
   { ok: true, pesan: '', pengeluaran: [{ nama: 'Makan & Minum', emoji: '🍜' }, { nama: 'Lainnya', emoji: '📦' }],
-    pemasukan: [{ nama: 'Gaji', emoji: '💼' }, { nama: 'Lainnya', emoji: '💰' }] }));
+    pemasukan: [{ nama: 'Gaji', emoji: '💼' }, { nama: 'Lainnya', emoji: '💰' }],
+    menuPengeluaran: ['🍜 Makan & Minum', '📦 Lainnya', '💰 Pemasukan…'],
+    menuPemasukan: ['💼 Gaji', '💰 Lainnya'] }));
+
+test('label menu tanpa emoji hanya nama', () => {
+  const st = new FakeStore({ kunci: 'K', kategori: [{ nama: 'Parkir', emoji: '', jenis: 'Pengeluaran', anggaran: 0, aktif: true }], transaksi: [] });
+  assert.deepStrictEqual(Array.from(tanganiPermintaan({ aksi: 'kategori', kunci: 'K' }, st, now).menuPengeluaran),
+    ['Parkir', '💰 Pemasukan…']);
+});
+
+test('catat menerima label menu sebagai kategori', () => {
+  const st = s();
+  const r = tanganiPermintaan({ aksi: 'catat', kunci: 'K', id: 'a9', nominal: 8000000, jenis: 'Pemasukan', kategori: '💰 Lainnya' }, st, now);
+  assert.match(r.pesan, /^Tersimpan Rp8\.000\.000 · 💰 Lainnya\nPemasukan bulan ini Rp8\.000\.000$/);
+  assert.strictEqual(st.baris[0][3], 'Lainnya');
+});
 
 test('catat menambah satu baris berformat benar', () => {
   const st = s();

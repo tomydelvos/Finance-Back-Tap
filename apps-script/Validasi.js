@@ -8,11 +8,17 @@ function normalisasiNama(s) {
   return String(s === null || s === undefined ? '' : s).trim().replace(/\s+/g, ' ').toLowerCase();
 }
 
+// Teks yang tampil di menu Shortcut, misalnya "🍜 Makan & Minum".
+function labelKategori(k) {
+  return k.emoji ? k.emoji + ' ' + k.nama : k.nama;
+}
+
 function cariKategori_(kategori, nama, jenis) {
   var dicari = normalisasiNama(nama);
   for (var i = 0; i < kategori.length; i++) {
     var k = kategori[i];
-    if (k.aktif && k.jenis === jenis && normalisasiNama(k.nama) === dicari) return k;
+    if (!k.aktif || k.jenis !== jenis) continue;
+    if (normalisasiNama(k.nama) === dicari || normalisasiNama(labelKategori(k)) === dicari) return k;
   }
   return null;
 }

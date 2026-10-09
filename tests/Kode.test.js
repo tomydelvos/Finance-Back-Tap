@@ -76,7 +76,8 @@ const post = (ctx, body) => {
 test('doPost aksi kategori membaca tab Kategori', () => {
   const { ctx } = siapkan();
   assert.deepStrictEqual(post(ctx, { aksi: 'kategori', kunci: 'K' }),
-    { ok: true, pesan: '', pengeluaran: [{ nama: 'Makan & Minum', emoji: '🍜' }, { nama: 'Lainnya', emoji: '📦' }], pemasukan: [] });
+    { ok: true, pesan: '', pengeluaran: [{ nama: 'Makan & Minum', emoji: '🍜' }, { nama: 'Lainnya', emoji: '📦' }], pemasukan: [],
+      menuPengeluaran: ['🍜 Makan & Minum', '📦 Lainnya', '💰 Pemasukan…'], menuPemasukan: [] });
 });
 
 test('doPost catat menulis baris dan melepas lock', () => {

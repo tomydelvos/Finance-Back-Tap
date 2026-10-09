@@ -75,3 +75,9 @@ test('Lainnya tidak ada di tab: tetap Lainnya, emoji kosong', () => {
   assert.strictEqual(r.data.kategori, 'Lainnya');
   assert.strictEqual(r.data.emoji, '');
 });
+
+test('label menu (emoji + nama) cocok ke kategori', () => {
+  const r = validasiCatat(B({ kategori: '🍜 Makan & Minum' }), KAT, now);
+  assert.strictEqual(r.data.kategori, 'Makan & Minum');
+  assert.strictEqual(r.data.catatanKategori, null);
+});
