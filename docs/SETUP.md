@@ -30,7 +30,7 @@ Lalu manifest:
 ## 3. Buat kunci
 
 1. Di toolbar atas, pilih fungsi **buatKunci**, lalu klik **Jalankan**.
-2. Pertama kali, Google meminta izin. Pilih akun Anda → **Lanjutan** → **Buka Catat Back Tap (tidak aman)** → **Izinkan**. Peringatan "tidak aman" muncul karena skrip ini buatan Anda sendiri dan belum diverifikasi Google.
+2. Pertama kali, Google meminta izin: **Tinjau izin** → pilih akun Anda → **Lanjutan** → **Buka Catat Back Tap (tidak aman)** → di daftar izin **centang "Pilih semua"** → **Lanjutkan**. Peringatan "tidak aman" muncul karena skrip ini buatan Anda sendiri dan belum diverifikasi Google. Kalau kotak izin tidak dicentang, muncul peringatan "This project requires access to your Google Account" dan izinnya harus diulang. Lakukan dari jendela Incognito yang hanya login dengan satu akun Google bila browser Anda login ke beberapa akun.
 3. Buka **Log eksekusi** di bawah. Salin teks setelah `Kunci baru:` (32 karakter). Simpan di Notes atau password manager; kunci ini dimasukkan ke Shortcut.
 
 Menjalankan `buatKunci` lagi akan **mengganti** kunci lama. Shortcut harus diisi ulang dengan kunci baru.
